@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Blip — shadow results</title>
+<meta name="description" content="Closed forward-test trades of strategy families not yet public. Testing only, not in the public record.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="shadow" data-root="">
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html">Blip<span>.</span></a>
+  <nav><a href="index.html">Record</a><a class="on" href="shadow.html">Shadow</a><a href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+</div></header>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h1>Shadow results</h1>
+  <p class="sub">Testing only, not in the public record. A strategy family publishes only after it passes the qualification gate and a forward shadow period; these are its closed shadow trades, revealed after close.</p>
+  <h2>By family</h2>
+  <div class="scroll"><table class="tbl" id="shadowfam"><thead><tr>
+    <th>Family</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg R</th><th class="num">Net R</th><th class="num">Void / expired</th>
+  </tr></thead><tbody><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+  <h2>Trades</h2>
+  <div class="scroll"><table class="tbl" id="shadowtrades"><thead><tr>
+    <th>Ref</th><th>Instrument</th><th>Side</th><th>Strategy</th><th>Status</th><th class="num">Result</th><th>Entry</th><th>Exit</th>
+  </tr></thead><tbody></tbody></table></div>
+</main>
+<footer><div class="wrap">
+  <p>For research only; not a recommendation. Shadow trades are model-tracked under the same rules as public signals; they were never published while open. <a href="disclaimer.html">Full disclaimer</a>.</p>
+  <p>Ledger head <span id="head" class="mono"></span></p>
+</div></footer>
+<script src="app.js"></script>
+</body>
+</html>

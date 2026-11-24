@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Blip — methodology</title>
+<meta name="description" content="How Blip signals, results and the verifiable log work: rules, costs, R, qualification, monitoring and known biases.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="methodology" data-root="">
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html">Blip<span>.</span></a>
+  <nav><a href="index.html">Record</a><a href="shadow.html">Shadow</a><a class="on" href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+</div></header>
+<main class="wrap prose">
+  <div id="banner" class="banner" hidden></div>
+  <h1>Methodology</h1>
+  <p class="sub">Fixed rules, published in advance. Nothing here implies guaranteed profit.</p>
+
+  <h2>What is measured</h2>
+  <p>Every result is in <b>R</b>: profit or loss divided by the initial risk per unit, <code>Ru = |fill − initial stop|</code>. Results are net of modeled fees, spread, slippage and financing (carry), computed from published prices. A win means a result above 0R; results within ±0.1R are also shown as scratches. Void and expired signals count as 0R and are listed and counted separately.</p>
+  <p>At 1% account risk per trade, 1R ≈ 1% of the account (hypothetical, simple sum, before taxes).</p>
+
+  <h2>Entry and fills</h2>
+  <p>Signals are evaluated on the closed daily bar. The recorded fill is the open of the first tradable hourly bar at or after the next whole hour following publication — never earlier than a reader could act. Each signal carries a valid entry range and a valid-until time. On the adverse side the range ends 0.5 × ATR(20) beyond the reference price; on the favorable side it ends halfway between the reference price and the stop. A fill through the stop is VOID (gap through stop); otherwise a fill outside the range is VOID (gap beyond range); no tradable price in the window is EXPIRED.</p>
+
+  <h2>Entry rules</h2>
+  <ul>
+    <li><b>Time-series momentum</b> (indices, FX, commodities, ETFs; crypto long only): 1-, 3- and 12-month returns all agree.</li>
+    <li><b>Donchian breakout</b> (Turtle System 2): close beyond the 55-day high or low.</li>
+    <li><b>52-week high</b> (US stocks, long only): new 52-week closing high above the 200-day average. Qualified on forward results only.</li>
+    <li><b>Crypto breakout ensemble</b> (long only): breakout confirmed on several lookbacks between 20 and 250 days.</li>
+    <li><b>Index mean reversion</b> (long only): short pullback (RSI-2) inside a long-term uptrend.</li>
+  </ul>
+  <p><b>Evidence labels refer to the entry rule only.</b> The published research behind them studied related but not identical systems (often continuous, volatility-scaled positions). The exit plan below is Blip&#39;s own and is measured against a pure trailing-stop baseline (“plan − baseline” below).</p>
+
+  <h2>Exits</h2>
+  <p>Trend rules: a resting initial stop; one third closed at TP1, after which the stop moves to the entry price; one third at TP2; the last third trails a chandelier stop that never loosens. Every stop change and scheduled exit is announced first and becomes effective at least one hour after it is posted. Mean reversion: a disaster stop, an exit at the next open after a close above the 5-day average, and a time stop.</p>
+
+  <h2>Costs</h2>
+  <div class="scroll"><table class="tbl"><thead><tr><th>Class</th><th class="num">Per side</th><th class="num">Carry long / yr</th><th class="num">Carry short / yr</th><th class="num">Stress</th></tr></thead><tbody>
+    <tr><td>Crypto majors (spot)</td><td class="num">0.15%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×1.5</td></tr>
+    <tr><td>Crypto other (spot)</td><td class="num">0.30%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×2.0</td></tr>
+    <tr><td>US stocks</td><td class="num">0.05%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×1.5</td></tr>
+    <tr><td>ETFs, commodities</td><td class="num">0.04%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
+    <tr><td>Indices (ETF proxies)</td><td class="num">0.03%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
+    <tr><td>FX majors</td><td class="num">0.015%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num">×1.5</td></tr>
+  </tbody></table></div>
+  <p>Index results assume the ETF; CFD financing is not included. FX carry is a flat 2% a year in both directions. Commodity signals are priced on ETFs.</p>
+
+  <h2>Qualification and monitoring</h2>
+  <p>A strategy family (rule × asset class) publishes only after passing a pre-set statistical gate on out-of-sample backtests and a forward shadow period. <b>Backtests are hypothetical.</b> Parameters are fixed per strategy version and never re-optimised. Live results are monitored against limits set in advance; crossing one pauses the family (open trades keep being reported). A portfolio drawdown of 40R pauses all public signals.</p>
+
+  <h2>Per-family risk disclosures</h2>
+  <p class="sub">Backtest figures are hypothetical, out-of-sample. “p95 1-yr DD” is the 95th-percentile one-year drawdown from a block bootstrap; expect drawdowns and losing streaks of this size.</p>
+  <div class="scroll"><table class="tbl" id="famtable"><thead><tr>
+    <th>Family</th><th>State</th><th class="num">p95 1-yr DD</th><th class="num">P(1-yr &lt; 0)</th><th class="num">Plan − baseline</th><th class="num">PBO</th><th class="num">Losing streak (bt / live)</th><th class="num">Live trades</th><th class="num">Tracking div.</th>
+  </tr></thead><tbody><tr><td colspan="9" class="empty">Loading…</td></tr></tbody></table></div>
+
+  <h2>Known biases and caveats</h2>
+  <ul>
+    <li><b>Only post-launch forward results are genuinely out-of-sample.</b> Backtest and live results are never mixed.</li>
+    <li>The live record uses data as published at signal time; backtests use revised data.</li>
+    <li>FX backtests fill at the next daily open (about one hour earlier than live): “approximate fill”.</li>
+    <li>For instruments priced from free vendor data, live tracking on hourly bars can differ from daily tracking; the measured tracking divergence (mean and 95% CI) is shown above.</li>
+    <li>Crypto backtests use a point-in-time universe including delisted pairs; ETF and FX selection may carry a small residual survivorship bias.</li>
+    <li>ETF prices differ from futures and CFDs; levels are also given as % distances.</li>
+  </ul>
+
+  <h2 id="verify">How to verify</h2>
+  <p>Every signal (public and lab) and every lifecycle event is appended to a hash-chained log. Open trades are committed to the log as salted hashes and revealed in full when they close. In results-only mode nothing actionable is public while a trade is open; in live mode public signals are posted in real time. Each day&#39;s log head is timestamped with OpenTimestamps (<code>heads/</code>), and this site&#39;s git history is a second, independent timestamp trail.</p>
+  <pre>python verify_ledger.py ledger.jsonl</pre>
+  <p class="small muted">The script uses the Python standard library only. It checks the chain and that every reveal matches its earlier commitments. This is a hash-chained, timestamped log.</p>
+</main>
+<footer><div class="wrap">
+  <p>Automated model output for research purposes only — not a recommendation to buy or sell and not personalized investment advice. <a href="disclaimer.html">Full disclaimer</a>.</p>
+  <p>Ledger head <span id="head" class="mono"></span></p>
+</div></footer>
+<script src="app.js"></script>
+</body>
+</html>

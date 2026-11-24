@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Blip — public record</title>
+<meta name="description" content="Every Blip signal, wins and losses, in R net of modeled costs. Hash-chained, timestamped log. For research only; not a recommendation to buy or sell.">
+<meta property="og:title" content="Blip — public record">
+<meta property="og:description" content="Every signal, wins and losses, in R net of modeled costs. For research only; not a recommendation.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="index" data-root="">
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html">Blip<span>.</span></a>
+  <nav><a class="on" href="index.html">Record</a><a href="shadow.html">Shadow</a><a href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+</div></header>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h1>Public record</h1>
+  <p class="sub">Forward results since launch, in R per trade, net of modeled fees, slippage and financing. Losses, voids and expiries are counted. Only post-launch results are genuinely out-of-sample.</p>
+  <div id="kpis" class="kpis" aria-live="polite"></div>
+  <h2>Equity (cumulative R)</h2>
+  <div id="equity" class="chart"><div class="empty">Loading…</div></div>
+  <h2>Signals</h2>
+  <div class="scroll"><table class="tbl" id="signals"><thead><tr>
+    <th>#</th><th>Instrument</th><th>Side</th><th>Status</th><th class="num">Result</th><th>Published</th><th>Closed</th>
+  </tr></thead><tbody><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+  <h2>By strategy</h2>
+  <div class="scroll"><table class="tbl" id="bystrategy"><thead><tr>
+    <th>Strategy</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg R</th><th class="num">Net R</th><th class="num">Void / expired</th><th></th>
+  </tr></thead><tbody></tbody></table></div>
+</main>
+<footer><div class="wrap">
+  <p>Automated model output for research purposes only — not a recommendation to buy or sell and not personalized investment advice. Operator holds no position, gets no compensation. Risk of loss. <a href="disclaimer.html">Full disclaimer</a>.</p>
+  <p>Open trades are committed as salted hashes and revealed after they close. <a href="methodology.html#verify">How to verify</a> · ledger head <span id="head" class="mono"></span></p>
+</div></footer>
+<script src="app.js"></script>
+</body>
+</html>
