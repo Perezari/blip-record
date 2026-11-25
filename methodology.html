@@ -46,11 +46,12 @@
     <tr><td>ETFs, commodities</td><td class="num">0.04%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
     <tr><td>Indices (ETF proxies)</td><td class="num">0.03%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
     <tr><td>FX majors</td><td class="num">0.015%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num">×1.5</td></tr>
+    <tr><td>USD/ILS</td><td class="num">0.05%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num">×1.5</td></tr>
   </tbody></table></div>
   <p>Index results assume the ETF; CFD financing is not included. FX carry is a flat 2% a year in both directions. Commodity signals are priced on ETFs.</p>
 
   <h2>Qualification and monitoring</h2>
-  <p>A strategy family (rule × asset class) publishes only after passing a pre-set statistical gate on out-of-sample backtests and a forward shadow period. <b>Backtests are hypothetical.</b> Parameters are fixed per strategy version and never re-optimised. Live results are monitored against limits set in advance; crossing one pauses the family (open trades keep being reported). A portfolio drawdown of 40R pauses all public signals.</p>
+  <p>A strategy family (rule × asset class) publishes only after passing a pre-set statistical gate on out-of-sample backtests and a forward shadow period. The 52-week-high family is the exception: its stock list was picked from today&#39;s winners, so it is never tested on past data (technical checks only) and must pass a longer forward period instead. <b>Backtests are hypothetical.</b> Parameters are fixed per strategy version and never re-optimised. Live results are monitored against limits set in advance; crossing one pauses the family (open trades keep being reported). In live mode, a public drawdown of 40R (open trades included) switches Blip back to results-only: signals continue and each trade is revealed after it closes.</p>
 
   <h2>Per-family risk disclosures</h2>
   <p class="sub">Backtest figures are hypothetical, out-of-sample. “p95 1-yr DD” is the 95th-percentile one-year drawdown from a block bootstrap; expect drawdowns and losing streaks of this size.</p>

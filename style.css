@@ -1,4 +1,6 @@
-/* Blip public record — dark, minimal. Colours match the PNG charts (spec §6.5). */
+/* Blip public record — dark, minimal. Colours match the PNG charts (spec §6.5).
+ * Direction-neutral: logical properties (start/end, inline-end) serve the English pages and the
+ * Hebrew pages (static/he/, dir="rtl") alike; the Hebrew-only classes are at the end. */
 :root {
   --bg: #0B0E14;
   --surface: #11151D;
@@ -23,8 +25,11 @@ a:hover { text-decoration: underline; }
 .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
 
 header.top { border-bottom: 1px solid var(--line); }
-header.top .wrap { display: flex; align-items: center; gap: 20px; height: 56px; flex-wrap: wrap; }
-.brand { font-weight: 700; letter-spacing: .02em; color: var(--text); font-size: 18px; }
+/* min-height, not height: on a phone the nav wraps to a second line and must not cover the page */
+header.top .wrap { display: flex; align-items: center; gap: 6px 20px; min-height: 56px; flex-wrap: wrap;
+  padding-top: 8px; padding-bottom: 8px; }
+.brand { font-weight: 700; letter-spacing: .02em; color: var(--text); font-size: 18px; direction: ltr;
+  unicode-bidi: isolate; }
 .brand span { color: var(--accent); }
 nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
 nav a { color: var(--muted); }
@@ -52,15 +57,15 @@ small, .small { font-size: 12px; }
 .flat { color: var(--muted); }
 
 .chart { border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
-.chart svg { display: block; width: 100%; height: auto; }
+.chart svg { display: block; width: 100%; height: auto; direction: ltr; }   /* axis labels stay beside the axis */
 .chart .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); padding: 2px 6px 6px; }
-.legend i { display: inline-block; width: 10px; height: 2px; vertical-align: middle; margin-right: 6px; }
+.legend i { display: inline-block; width: 10px; height: 2px; vertical-align: middle; margin-inline-end: 6px; }
 
 .tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
 .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.tbl th, .tbl td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl th, .tbl td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 .tbl th { color: var(--muted); font-weight: 500; font-size: 12px; }
-.tbl td.num, .tbl th.num { text-align: right; }
+.tbl td.num, .tbl th.num { text-align: end; }
 .tbl tr:hover td { background: var(--surface); }
 
 .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--line); color: var(--muted); }
@@ -73,18 +78,77 @@ small, .small { font-size: 12px; }
 .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .card dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-variant-numeric: tabular-nums; }
 .card dt { color: var(--muted); }
-.card dd { margin: 0; text-align: right; }
+.card dd { margin: 0; text-align: end; }
 .resultcard { max-width: 100%; border-radius: 10px; border: 1px solid var(--line); margin-top: 16px; }
 
 code, .mono { font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
-pre { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+code, pre, .mono { direction: ltr; unicode-bidi: isolate; }   /* hashes, refs and commands read left to right */
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto;
+  text-align: left; }
 
 .prose { max-width: 760px; }
 .prose p, .prose li { color: #C9CDD6; }
 .prose h2 { margin-top: 28px; }
-.he { direction: rtl; text-align: right; }
+.he { direction: rtl; text-align: start; }
 
 footer { border-top: 1px solid var(--line); padding: 18px 0 40px; color: var(--muted); font-size: 12px; }
 footer p { margin: 4px 0; }
 .empty { color: var(--muted); padding: 18px 0; }
 .err { color: var(--down); }
+
+/* Hebrew pages only (static/he/): classes and selectors the English pages never use. */
+.prose h3 { font-size: 15px; margin: 22px 0 6px; }
+.stage { margin: 16px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; }
+.stage h2 { margin: 0 0 8px; }
+.stage h3 { font-size: 14px; margin: 14px 0 4px; }
+.stage p { margin: 0 0 6px; }
+.stage .head { font-weight: 600; }
+.stage .detail { color: var(--muted); font-size: 13px; }
+.stage .tbl { font-size: 13px; }
+.stage .tbl th, .stage .tbl td { padding: 6px; }
+.stage .tbl td.lbl { white-space: normal; }
+details.explain, details.more { margin: 8px 0 16px; font-size: 13px; color: var(--muted); }
+details.explain summary, details.more summary { cursor: pointer; color: var(--accent); }
+dl.help, dl.glossary { display: grid; grid-template-columns: minmax(8em, max-content) 1fr; gap: 6px 14px;
+  margin: 8px 0 0; }
+dl.help dt, dl.glossary dt { color: var(--text); font-weight: 600; }
+dl.help dd, dl.glossary dd { margin: 0; }
+.tbl td.wrap { white-space: normal; min-width: 12em; }
+html[dir="rtl"] .prose a, html[dir="rtl"] footer a { overflow-wrap: anywhere; }
+html[dir="rtl"] .tbl td.empty { white-space: normal; }
+/* an empty table shows its one-line message without a header row, inside the screen */
+html[dir="rtl"] .tbl:has(td.empty) thead { display: none; }
+html[dir="rtl"] .tbl td.empty { padding-inline: 0; border-bottom: 0; }
+/* a table whose body stays empty (closed trial trades before the first close): hidden with its heading */
+html[dir="rtl"] h2:has(+ .scroll > .tbl > tbody:empty),
+html[dir="rtl"] .scroll:has(> .tbl > tbody:empty) { display: none; }
+/* prose tables (costs, families, risk) wrap instead of scrolling sideways */
+html[dir="rtl"] .prose .tbl th, html[dir="rtl"] .prose .tbl td { white-space: normal; }
+/* trial-progress table: as wide as its content, so the values sit next to their labels */
+.stage .tbl { width: auto; }
+/* cards: no doubled space at the top and bottom, a smaller list indent */
+html[dir="rtl"] .card > :first-child { margin-top: 0; }
+html[dir="rtl"] .card > :last-child { margin-bottom: 0; }
+html[dir="rtl"] .card ul { padding-inline-start: 1.25em; }
+@media (max-width: 560px) {
+  dl.help, dl.glossary { grid-template-columns: 1fr; gap: 2px; }
+  dl.help dd, dl.glossary dd { margin-bottom: 8px; }
+  /* label/value cards (signal page): the labels take at most 40% of the card */
+  html[dir="rtl"] .card dl { grid-template-columns: fit-content(40%) minmax(0, 1fr); }
+  /* record tables fit a phone: cells wrap; numbers, pills and trade ids stay on one line; the published date,
+     the few-trades note and, on the trial page, the family and entry-date columns are dropped */
+  html[dir="rtl"] .tbl th, html[dir="rtl"] .tbl td { white-space: normal; padding: 8px 4px; }
+  html[dir="rtl"] .tbl td.num, html[dir="rtl"] .tbl .pill,
+  html[dir="rtl"] #shadowtrades td:first-child { white-space: nowrap; }
+  html[dir="rtl"] .prose .tbl td.num { white-space: normal; }
+  html[dir="rtl"] #signals th:nth-child(6), html[dir="rtl"] #signals td:nth-child(6),
+  html[dir="rtl"] #byfamily th:nth-child(7), html[dir="rtl"] #byfamily td:nth-child(7),
+  html[dir="rtl"] #shadowtrades th:nth-child(4), html[dir="rtl"] #shadowtrades td:nth-child(4),
+  html[dir="rtl"] #shadowtrades th:nth-child(7), html[dir="rtl"] #shadowtrades td:nth-child(7) { display: none; }
+  /* methodology families list stacks: name and state on one line, the details under them */
+  html[dir="rtl"] #famsimple thead { display: none; }
+  html[dir="rtl"] #famsimple tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 0;
+    border-bottom: 1px solid var(--line); }
+  html[dir="rtl"] #famsimple td { border: 0; padding: 0; }
+  html[dir="rtl"] #famsimple td.wrap { grid-column: 1 / -1; min-width: 0; }
+}
