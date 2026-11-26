@@ -1,83 +1,256 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Blip — methodology</title>
-<meta name="description" content="How Blip signals, results and the verifiable log work: rules, costs, R, qualification, monitoring and known biases.">
-<link rel="stylesheet" href="style.css">
+<title>איך זה עובד — Blip</title>
+<meta name="description" content="איך Blip עובד, בשפה פשוטה: מה זה איתות, איך מודדים תוצאות, עלויות, איך שיטה מתחילה לפרסם, ואיך בודקים את היומן הציבורי.">
+<meta property="og:locale" content="he_IL">
+<link rel="stylesheet" href="style.css?v=he2">
 </head>
 <body data-page="methodology" data-root="">
 <header class="top"><div class="wrap">
-  <a class="brand" href="index.html">Blip<span>.</span></a>
-  <nav><a href="index.html">Record</a><a href="shadow.html">Shadow</a><a class="on" href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+  <a class="brand" dir="ltr" href="index.html">Blip<span>.</span></a>
+  <nav><a href="index.html">תוצאות</a><a href="shadow.html">תקופת ניסיון</a><a class="on" href="methodology.html">איך זה עובד</a><a href="disclaimer.html">גילוי נאות</a></nav>
 </div></header>
 <main class="wrap prose">
   <div id="banner" class="banner" hidden></div>
-  <h1>Methodology</h1>
-  <p class="sub">Fixed rules, published in advance. Nothing here implies guaranteed profit.</p>
+  <h1>איך זה עובד</h1>
+  <p class="sub">הכללים קבועים ופורסמו מראש. שום דבר כאן לא מבטיח רווח.</p>
 
-  <h2>What is measured</h2>
-  <p>Every result is in <b>R</b>: profit or loss divided by the initial risk per unit, <code>Ru = |fill − initial stop|</code>. Results are net of modeled fees, spread, slippage and financing (carry), computed from published prices. A win means a result above 0R; results within ±0.1R are also shown as scratches. Void and expired signals count as 0R and are listed and counted separately.</p>
-  <p>At 1% account risk per trade, 1R ≈ 1% of the account (hypothetical, simple sum, before taxes).</p>
-
-  <h2>Entry and fills</h2>
-  <p>Signals are evaluated on the closed daily bar. The recorded fill is the open of the first tradable hourly bar at or after the next whole hour following publication — never earlier than a reader could act. Each signal carries a valid entry range and a valid-until time. On the adverse side the range ends 0.5 × ATR(20) beyond the reference price; on the favorable side it ends halfway between the reference price and the stop. A fill through the stop is VOID (gap through stop); otherwise a fill outside the range is VOID (gap beyond range); no tradable price in the window is EXPIRED.</p>
-
-  <h2>Entry rules</h2>
+  <h2>בקצרה</h2>
   <ul>
-    <li><b>Time-series momentum</b> (indices, FX, commodities, ETFs; crypto long only): 1-, 3- and 12-month returns all agree.</li>
-    <li><b>Donchian breakout</b> (Turtle System 2): close beyond the 55-day high or low.</li>
-    <li><b>52-week high</b> (US stocks, long only): new 52-week closing high above the 200-day average. Qualified on forward results only.</li>
-    <li><b>Crypto breakout ensemble</b> (long only): breakout confirmed on several lookbacks between 20 and 250 days.</li>
-    <li><b>Index mean reversion</b> (long only): short pullback (RSI-2) inside a long-term uptrend.</li>
+    <li>Blip הוא מערכת אוטומטית. פעם ביום, אחרי שהמסחר נסגר, הוא בודק 60 נכסים: קריפטו, מניות בארה״ב, תעודות סל, מדדי מניות, מט״ח וסחורות.</li>
+    <li>יש לו 5 כללי כניסה קבועים. כלל כניסה אחד על סוג נכס אחד נקרא כאן <b>שיטה</b>. יש 12 שיטות, וכל אחת נבדקת לבד.</li>
+    <li>שיטה מתחילה לפרסם איתותים רק אחרי שהיא עומדת בתנאים שנקבעו מראש: קודם מבחן על נתוני עבר, ואחריו תקופת ניסיון בזמן אמת. שיטה אחת לא נבדקת על נתוני עבר, והיא עוברת רק תקופת ניסיון ארוכה יותר (<a href="#stages">הסבר למטה</a>).</li>
+    <li>כל איתות נמדד עד הסוף, ברווח או בהפסד. כל התוצאות מוצגות באתר, גם איתותים שבוטלו או שפג תוקפם.</li>
+    <li>כל איתות נרשם ביומן ציבורי שאי אפשר לשנות בדיעבד, וכל אחד יכול לבדוק שהתוצאות תואמות למה שנרשם מראש.</li>
   </ul>
-  <p><b>Evidence labels refer to the entry rule only.</b> The published research behind them studied related but not identical systems (often continuous, volatility-scaled positions). The exit plan below is Blip&#39;s own and is measured against a pure trailing-stop baseline (“plan − baseline” below).</p>
 
-  <h2>Exits</h2>
-  <p>Trend rules: a resting initial stop; one third closed at TP1, after which the stop moves to the entry price; one third at TP2; the last third trails a chandelier stop that never loosens. Every stop change and scheduled exit is announced first and becomes effective at least one hour after it is posted. Mean reversion: a disaster stop, an exit at the next open after a close above the 5-day average, and a time stop.</p>
+  <h2>מה זה איתות</h2>
+  <p>איתות הוא הודעה אוטומטית שאומרת:</p>
+  <ul>
+    <li>על איזה נכס מדובר.</li>
+    <li>באיזה כיוון:
+      <ul>
+        <li><b>קנייה</b>: מרוויחים אם המחיר עולה.</li>
+        <li><b>מכירה בחסר</b>: מרוויחים אם המחיר יורד. הסטופ נמצא מעל מחיר הכניסה.</li>
+      </ul>
+    </li>
+    <li>באיזה טווח מחירים אפשר להיכנס, ועד מתי.</li>
+    <li>איפה יוצאים בהפסד (<b>סטופ</b>), ובחלק מהשיטות גם איפה סוגרים חלק ברווח (<b>יעד ⁦1⁩</b> ו<b>יעד ⁦2⁩</b>).</li>
+  </ul>
 
-  <h2>Costs</h2>
-  <div class="scroll"><table class="tbl"><thead><tr><th>Class</th><th class="num">Per side</th><th class="num">Carry long / yr</th><th class="num">Carry short / yr</th><th class="num">Stress</th></tr></thead><tbody>
-    <tr><td>Crypto majors (spot)</td><td class="num">0.15%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×1.5</td></tr>
-    <tr><td>Crypto other (spot)</td><td class="num">0.30%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×2.0</td></tr>
-    <tr><td>US stocks</td><td class="num">0.05%</td><td class="num">0</td><td class="num">n/a</td><td class="num">×1.5</td></tr>
-    <tr><td>ETFs, commodities</td><td class="num">0.04%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
-    <tr><td>Indices (ETF proxies)</td><td class="num">0.03%</td><td class="num">0</td><td class="num">1.0% + dividend yield</td><td class="num">×1.5</td></tr>
-    <tr><td>FX majors</td><td class="num">0.015%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num">×1.5</td></tr>
-    <tr><td>USD/ILS</td><td class="num">0.05%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num">×1.5</td></tr>
+  <h2>איך מודדים תוצאה: R</h2>
+  <p>כל תוצאה נמדדת ב-<b>R</b>, יחידת סיכון. 1R הוא הסכום שמסכנים בעסקה אחת, כלומר כמה מפסידים אם המחיר מגיע לסטופ ההתחלתי. ⁦+1R⁩ = רווח בגובה הסיכון, ⁦-1R⁩ = הפסד בגובה הסיכון, ⁦+0.10R⁩ = ⁦10⁩ אגורות על כל שקל שמסכנים.</p>
+  <p>אם מסכנים ⁦1%⁩ מהחשבון בכל עסקה, ⁦1R⁩ שווה בערך ל-⁦1%⁩ מהחשבון (חישוב היפותטי, סכום פשוט, לפני מס).</p>
+  <p>כל התוצאות מחושבות מהמחירים שפורסמו, ו<b>אחרי עלויות משוערות</b>: עמלה, מרווח בין מחיר הקנייה למחיר המכירה, החלקה ועלות מימון. הן מנוכות מכל תוצאה.</p>
+  <p>עסקה <b>מצליחה</b> היא עסקה שהסתיימה מעל 0R. עסקה שהסתיימה קרוב לאפס, פחות מ-0.1R לכל כיוון, נקראת <b>עסקה מאוזנת</b>, והיא מוצגת גם בנפרד. איתותים <b>שבוטלו</b> או <b>שפג תוקפם</b> נרשמים כ-0R, מופיעים ברשימה ונספרים בנפרד.</p>
+
+  <h2>כניסה לעסקה</h2>
+  <p>הכללים נבדקים על נתונים של יום מסחר שכבר הסתיים. מחיר הכניסה שנרשם הוא מחיר הפתיחה של השעה הראשונה שאפשר לסחור בה, מהשעה העגולה הבאה אחרי הפרסום ואילך. כך הכניסה אף פעם לא מוקדמת מהרגע שבו קוראים יכלו לפעול.</p>
+  <p>לכל איתות יש <b>טווח כניסה</b> ושעה שעד אליה הוא בתוקף (<b>בתוקף עד</b>). <b>מחיר ייחוס</b> הוא מחיר הסגירה של יום האיתות. בצד הפחות טוב (מחיר גבוה יותר בקנייה, נמוך יותר במכירה בחסר) הטווח נגמר חצי <bdi dir="ltr">ATR(20)</bdi> אחרי מחיר הייחוס. בצד הטוב הטווח נגמר באמצע הדרך בין מחיר הייחוס לסטופ. <bdi dir="ltr">ATR(20)</bdi> היא התנודה היומית הממוצעת: כמה המחיר זז ביום, בממוצע על ⁦20⁩ הימים האחרונים.</p>
+  <ul>
+    <li>אם מחיר הכניסה כבר מעבר לסטופ, האיתות מסומן <b>בוטל</b> (המחיר נפתח כבר מעבר לסטופ).</li>
+    <li>אחרת, אם מחיר הכניסה מחוץ לטווח הכניסה, האיתות מסומן <b>בוטל</b> (המחיר נפתח מחוץ לטווח הכניסה).</li>
+    <li>אם בזמן שהאיתות היה בתוקף לא היה מחיר מסחר בכלל, האיתות מסומן <b>פג תוקף</b>.</li>
+  </ul>
+
+  <h2>כללי הכניסה</h2>
+  <ul>
+<li><b>מעקב מגמה</b> (מדדי מניות, מט״ח, סחורות, תעודות סל, קריפטו). נכנסים בכיוון שבו המחיר נע גם בחודש האחרון, גם ב-⁦3⁩ החודשים האחרונים וגם בשנה האחרונה.</li>
+<li><b>פריצת טווח ⁦55⁩ יום</b> (מדדי מניות, מט״ח, סחורות, תעודות סל). סגירה מעל השיא של ⁦55⁩ הימים האחרונים (קנייה) או מתחת לשפל שלהם (מכירה בחסר).</li>
+<li><b>שיא שנתי חדש</b> (מניות בארה״ב). מניה נסגרת בשיא של ⁦52⁩ שבועות, מעל הממוצע של ⁦200⁩ הימים. קנייה בלבד, על ⁦17⁩ מניות גדולות בארה״ב.</li>
+<li><b>פריצה בקריפטו</b>. פריצה כלפי מעלה שמאושרת ב-⁦3⁩ לפחות מתוך ⁦6⁩ טווחי זמן, בין ⁦20⁩ ל-⁦250⁩ יום. קנייה בלבד.</li>
+<li><b>ירידה קצרה במגמת עלייה</b> (מדדי מניות). קנייה של מדד מניות אחרי ירידה חדה וקצרה, כשהמגמה הארוכה היא עלייה.</li>
+</ul>
+  <p>מכירה בחסר קיימת רק בשני הכללים הראשונים, על מדדי מניות, מט״ח, סחורות ותעודות סל. בקריפטו ובמניות בארה״ב יש רק קנייה.</p>
+  <p>השיטה <b>שיא שנתי חדש</b> לא נבדקת על נתוני עבר: רשימת 17 המניות שלה נבחרה ב-2026 מתוך החברות המצליחות של היום, ולכן בדיקה על העבר הייתה מייפה את התוצאות. היא עוברת רק בדיקות טכניות, ונמדדת רק מעכשיו, בזמן אמת (מסלול זמן אמת בלבד).</p>
+  <p><b>המחקר שמאחורי הכללים מתייחס לכלל הכניסה בלבד.</b> המחקרים שפורסמו בדקו שיטות דומות אבל לא זהות (בדרך כלל החזקה רציפה שמותאמת לתנודתיות). תוכנית היציאה היא של Blip עצמה, והיא נמדדת מול יציאה פשוטה עם סטופ נגרר בלבד (הטור <b>תוכנית פחות בסיס</b> בטבלת הסיכון למטה).</p>
+
+  <h2>יציאה מעסקה</h2>
+  <p>בארבעת כללי המגמה (מעקב מגמה, פריצת טווח ⁦55⁩ יום, שיא שנתי חדש, פריצה בקריפטו):</p>
+  <ul>
+    <li>יש סטופ התחלתי שממתין בשוק כל הזמן.</li>
+    <li>ביעד ⁦1⁩ נסגר שליש מהעסקה, ואז הסטופ עובר למחיר הכניסה (סטופ במחיר הכניסה).</li>
+    <li>ביעד ⁦2⁩ נסגר עוד שליש.</li>
+    <li>השליש האחרון ממשיך עם סטופ נגרר: סטופ שזז אחרי המחיר רק בכיוון שמגן על הרווח, ואף פעם לא מתרחק.</li>
+    <li>במעקב מגמה, בפריצת טווח ⁦55⁩ יום ובפריצה בקריפטו יש גם כלל יציאה: התנאי שפתח את העסקה כבר לא מתקיים, ולכן יוצאים בפתיחת המסחר הבאה. מודיעים על זה מראש.</li>
+  </ul>
+  <p>בכלל ירידה קצרה במגמת עלייה: סטופ חירום, יציאה בפתיחה הבאה אחרי סגירה מעל הממוצע של 5 הימים האחרונים, ויציאה לפי זמן אחרי 7 ימי מסחר.</p>
+  <p>כל הזזת סטופ וכל יציאה מתוכננת מתפרסמות קודם, ונכנסות לתוקף לפחות שעה אחרי הפרסום.</p>
+
+  <h2>עלויות</h2>
+  <p class="sub">העלות לכל צד (פעם בכניסה ופעם ביציאה) כוללת עמלה, מרווח והחלקה. עלות מימון: עלות שנתית על החזקת עסקה פתוחה לאורך זמן. מבחן לחץ עלויות: אותה בדיקה עם עלויות גבוהות פי ⁦1.5⁩ (במטבעות קריפטו קטנים: פי ⁦2⁩).</p>
+  <div class="scroll"><table class="tbl"><thead><tr><th>סוג נכס</th><th class="num">עלות לכל צד</th><th class="num">עלות מימון בקנייה (לשנה)</th><th class="num">עלות מימון במכירה בחסר (לשנה)</th><th class="num">מבחן לחץ עלויות</th></tr></thead><tbody>
+    <tr><td>קריפטו גדולים (10 מטבעות)</td><td class="num">0.15%</td><td class="num">0</td><td class="num">אין מכירה בחסר</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
+    <tr><td>קריפטו קטנים (10 מטבעות)</td><td class="num">0.30%</td><td class="num">0</td><td class="num">אין מכירה בחסר</td><td class="num"><bdi dir="ltr">×2.0</bdi></td></tr>
+    <tr><td>מניות בארה״ב</td><td class="num">0.05%</td><td class="num">0</td><td class="num">אין מכירה בחסר</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
+    <tr><td>תעודות סל, סחורות</td><td class="num">0.04%</td><td class="num">0</td><td class="num">1.0% + תשואת הדיבידנד</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
+    <tr><td>מדדי מניות (לפי תעודת הסל של המדד)</td><td class="num">0.03%</td><td class="num">0</td><td class="num">1.0% + תשואת הדיבידנד</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
+    <tr><td>מט״ח, זוגות מטבעות מרכזיים</td><td class="num">0.015%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
+    <tr><td>דולר מול שקל</td><td class="num">0.05%</td><td class="num">2.0%</td><td class="num">2.0%</td><td class="num"><bdi dir="ltr">×1.5</bdi></td></tr>
   </tbody></table></div>
-  <p>Index results assume the ETF; CFD financing is not included. FX carry is a flat 2% a year in both directions. Commodity signals are priced on ETFs.</p>
+  <p>תוצאות המדדים מניחות מסחר בתעודת הסל של המדד, ועלויות מימון של חוזי הפרשים (<bdi dir="ltr">CFD</bdi>) לא כלולות. עלות המימון במט״ח היא 2% לשנה, קבועה, בשני הכיוונים. איתותי סחורות מתומחרים לפי תעודות סל.</p>
 
-  <h2>Qualification and monitoring</h2>
-  <p>A strategy family (rule × asset class) publishes only after passing a pre-set statistical gate on out-of-sample backtests and a forward shadow period. The 52-week-high family is the exception: its stock list was picked from today&#39;s winners, so it is never tested on past data (technical checks only) and must pass a longer forward period instead. <b>Backtests are hypothetical.</b> Parameters are fixed per strategy version and never re-optimised. Live results are monitored against limits set in advance; crossing one pauses the family (open trades keep being reported). In live mode, a public drawdown of 40R (open trades included) switches Blip back to results-only: signals continue and each trade is revealed after it closes.</p>
-
-  <h2>Per-family risk disclosures</h2>
-  <p class="sub">Backtest figures are hypothetical, out-of-sample. “p95 1-yr DD” is the 95th-percentile one-year drawdown from a block bootstrap; expect drawdowns and losing streaks of this size.</p>
-  <div class="scroll"><table class="tbl" id="famtable"><thead><tr>
-    <th>Family</th><th>State</th><th class="num">p95 1-yr DD</th><th class="num">P(1-yr &lt; 0)</th><th class="num">Plan − baseline</th><th class="num">PBO</th><th class="num">Losing streak (bt / live)</th><th class="num">Live trades</th><th class="num">Tracking div.</th>
-  </tr></thead><tbody><tr><td colspan="9" class="empty">Loading…</td></tr></tbody></table></div>
-
-  <h2>Known biases and caveats</h2>
+  <h2 id="stages">איך שיטה מתחילה לפרסם</h2>
+  <ol>
+    <li><b>מבחן על נתוני עבר.</b> בדיקה סטטיסטית חד-פעמית של שיטה על נתוני עבר, מול תנאים שנקבעו מראש. שיטה שעוברת אותה ממשיכה לתקופת ניסיון. בדיקות על נתוני עבר הן היפותטיות.</li>
+    <li><b>תקופת ניסיון.</b> מודדים את השיטה בזמן אמת לפי הכללים הקבועים שלה, בלי לפרסם איתותים. העסקאות שלה מוצגות רק אחרי שהן נסגרות. העסקאות שנסגרו מוצגות בעמוד <a href="shadow.html">תקופת ניסיון</a>.</li>
+    <li><b>פרסום.</b> רק שיטה שעמדה בכל התנאים של תקופת הניסיון מתחילה לפרסם איתותים ציבוריים.</li>
+  </ol>
+  <p>שיטה במסלול זמן אמת בלבד מדלגת על השלב הראשון: היא עוברת רק בדיקות טכניות, ותקופת הניסיון שלה ארוכה ומחמירה יותר. כרגע זו רק שיא שנתי חדש.</p>
+  <p>הפרמטרים קבועים לכל גרסה של שיטה, ולא מכוונים מחדש. כל שינוי בכללים, בפרמטרים או בעלויות יוצר גרסה חדשה, שעוברת מבחן ותקופת ניסיון מחדש. שיטה שלא עברה את המבחן לא נבדקת שוב לבד: רק גרסה חדשה שלה יכולה להיבדק מחדש.</p>
+  <h3>מה המבחן על נתוני עבר בודק</h3>
+  <p>שיטה עוברת רק אם היא עומדת בכל התנאים האלה, על נתוני עבר ואחרי עלויות:</p>
   <ul>
-    <li><b>Only post-launch forward results are genuinely out-of-sample.</b> Backtest and live results are never mixed.</li>
-    <li>The live record uses data as published at signal time; backtests use revised data.</li>
-    <li>FX backtests fill at the next daily open (about one hour earlier than live): “approximate fill”.</li>
-    <li>For instruments priced from free vendor data, live tracking on hourly bars can differ from daily tracking; the measured tracking divergence (mean and 95% CI) is shown above.</li>
-    <li>Crypto backtests use a point-in-time universe including delisted pairs; ETF and FX selection may carry a small residual survivorship bias.</li>
-    <li>ETF prices differ from futures and CFDs; levels are also given as % distances.</li>
+<li><b>מספיק נתונים</b>. לפחות ⁦100⁩ עסקאות שנסגרו, ולפחות ⁦104⁩ שבועות שבהם הייתה עסקה פתוחה.</li>
+<li><b>רווח ממוצע</b>. לפחות ⁦+0.10R⁩ לעסקה בממוצע, ויציב מספיק כדי שלא ייראה כמו מקרה (מדד ⁦t⁩ של ⁦2⁩ לפחות).</li>
+<li><b>יחס רווח להפסד</b>. סך הרווחים גדול לפחות פי ⁦1.25⁩ מסך ההפסדים.</li>
+<li><b>בדיקת מזל</b>. התוצאה נשארת טובה גם אחרי קנס על מספר הגרסאות שנבדקו (⁦DSR⁩ של ⁦0.95⁩ לפחות).</li>
+<li><b>יציבות לאורך זמן</b>. לפחות מחצית מתקופות של ⁦12⁩ חודשים (נבדק כל רבעון) הסתיימו ברווח.</li>
+<li><b>פיזור הרווח</b>. נשאר רווח גם כשמגבילים את ⁦1%⁩ העסקאות הגדולות ביותר, וגם בלי השנה הקלנדרית הכי טובה.</li>
+<li><b>יציבות בהגדרות קרובות</b>. לפחות ⁦7⁩ מתוך ⁦8⁩ הגדרות קרובות מרוויחות, והחציון שלהן הוא לפחות ⁦60%⁩ מהתוצאה של ההגדרה הרגילה.</li>
+<li><b>עמידות לעלויות גבוהות</b>. גם בעלויות גבוהות פי ⁦1.5⁩ (במטבעות קריפטו קטנים: פי ⁦2⁩) נשאר רווח, ויחס הרווח להפסד הוא לפחות ⁦1.10⁩.</li>
+<li><b>סיכוי לשנה מפסידה</b>. בהגרלה של ⁦10,000⁩ שנים אפשריות, לכל היותר ⁦35%⁩ מהן מסתיימות בהפסד.</li>
+<li><b>תקופה שמורה</b>. בשנה שנשמרה בצד (מ-⁦1.11.2025⁩) התוצאה לא גרועה משמעותית מהעבר. אם יש בה פחות מ-⁦10⁩ עסקאות, תקופת הניסיון עוברת למסלול מורחב.</li>
+<li><b>בדיקה טכנית: בלי הצצה לעתיד</b>. ההחלטות עד יום מסוים יוצאות זהות גם כשמוחקים את כל מה שקרה אחריו.</li>
+<li><b>בדיקה טכנית: ימים לא ברורים</b>. לכל היותר ⁦10%⁩ מהעסקאות הוכרעו ביום שבו המחיר נגע גם בסטופ וגם ביעד.</li>
+</ul>
+  <p class="small muted">סיכון להתאמת יתר (⁦PBO⁩): מחושב ומוצג לידיעה בלבד. הוא לא קובע אם שיטה עוברת.</p>
+  <h3>התנאים של תקופת הניסיון</h3>
+  <p>כדי לעבור לפרסום, שיטה בתקופת ניסיון צריכה לעמוד בכל התנאים של המסלול שלה. הבדיקה רצה כל לילה ב-04:30 לפי שעון ישראל (בשעון קיץ ב-05:30), כך ששיטה יכולה לעבור לפרסום רק בבוקר שאחרי שהיא עומדת בתנאים. ההתקדמות של כל שיטה מוצגת <a href="index.html">בעמוד הבית</a>.</p>
+  <ul>
+<li><b>מסלול רגיל</b>. לפחות ⁦60⁩ יום, ⁦10⁩ עסקאות שנפתחו ו-⁦5⁩ שנסגרו, ירידה מהשיא שלא גדולה מהירידה הצפויה בשנה רעה, ובלי התרעת בקרה.</li>
+<li><b>מסלול מורחב</b>. לפחות ⁦182⁩ יום (כחצי שנה), ⁦30⁩ עסקאות שנסגרו, ממוצע מעל ⁦0⁩, ובלי התרעת בקרה.</li>
+<li><b>מסלול זמן אמת בלבד</b>. לפחות ⁦273⁩ יום (כ-⁦9⁩ חודשים), ⁦40⁩ עסקאות שנסגרו, ממוצע של ⁦+0.10R⁩ לפחות, יחס רווח להפסד של ⁦1.25⁩ לפחות, ובלי התרעת בקרה.</li>
+</ul>
+  <h3>אחרי שהשיטה מפרסמת</h3>
+  <p><b>בקרת ביצועים</b> בודקת כל הזמן אם התוצאות בזמן אמת חורגות מגבולות שנקבעו מראש: רצף הפסדים, הפסד מצטבר או ירידה מהשיא. אם יש חריגה, השיטה <b>מושהית</b>: עסקאות פתוחות ממשיכות להיות מדווחות, ואיתותים חדשים לא מתפרסמים. היא חוזרת לפרסם רק אחרי שנסגרו לפחות 20 עסקאות ניסיון מאז ההשהיה, והן עברו בדיקה סטטיסטית. שיטה שהושהתה פעמיים בתוך 12 חודשים מוצאת משימוש לצמיתות.</p>
+  <p>פעם בחודש רצה בדיקה טכנית על כל שיטה שמפרסמת, מושהית או בתקופת ניסיון. אם הבדיקה נכשלת, השיטה מושהית. אם שיטה הושהתה בזמן תקופת הניסיון, כשהיא חוזרת היא מתחילה תקופת ניסיון חדשה מההתחלה.</p>
+  <p><b>מתג חירום:</b> במצב חי, אם התוצאה המצטברת של העסקאות הציבוריות, כולל הפתוחות, יורדת ב-⁦40R⁩ מהשיא שלה, ⁦Blip⁩ חוזר לבד למצב תוצאות בלבד, ולא חוזר למצב חי בלי החלטה של המפעיל.</p>
+
+  <h2 id="families">השיטות והמצב שלהן</h2>
+  <div class="scroll"><table class="tbl" id="famsimple"><thead><tr>
+    <th>שיטה</th><th>מצב</th><th>פרטים</th>
+  </tr></thead><tbody><tr><td colspan="3" class="empty">טוען…</td></tr></tbody></table></div>
+  <details class="more"><summary>מה אומר כל מצב?</summary>
+    <dl class="help">
+<dt>בתקופת ניסיון</dt><dd>נמדדת בזמן אמת לפי הכללים הקבועים שלה, בלי לפרסם איתותים. העסקאות שלה מוצגות רק אחרי שהן נסגרות.</dd>
+<dt>מפרסמת</dt><dd>עברה את תקופת הניסיון, והאיתותים שלה מתפרסמים לציבור.</dd>
+<dt>מושהית</dt><dd>איתותים חדשים נעצרו, כי התוצאות חצו גבול שנקבע מראש או כי בדיקת תקינות נכשלה. עסקאות פתוחות ממשיכות להיות מדווחות.</dd>
+<dt>לא עברה את המבחן</dt><dd>נבדקה ולא עמדה בתנאים, ולכן היא לא מפרסמת איתותים. ⁦Blip⁩ ממשיך לעקוב אחריה בשקט, ובגרסה הזו היא לא תיבדק שוב אוטומטית.</dd>
+<dt>ממתינה למבחן</dt><dd>עוד לא נבדקה, למשל כי חסרים נתונים או כי הכללים שלה השתנו.</dd>
+<dt>הוצאה משימוש</dt><dd>הושהתה פעמיים בתוך ⁦12⁩ חודשים, ולכן הופסקה לצמיתות.</dd>
+</dl>
+  </details>
+  <details class="more"><summary>נתוני סיכון לכל שיטה (למתקדמים)</summary>
+    <p>נתוני העבר הם חישוב היפותטי, עם הגדרות קבועות שלא כוונו לפי התוצאות. רק תוצאות בזמן אמת, אחרי ההשקה, הן בדיקה אמיתית. ירידה בשנה רעה: ירידה מהשיא במשך שנה אחת, שרק ב-⁦5%⁩ מהשנים בסימולציה הייתה גדולה ממנה. ירידות כאלה הן חלק צפוי מהדרך.</p>
+    <div class="scroll"><table class="tbl" id="famtable"><thead><tr>
+      <th>שיטה</th><th>מצב</th><th class="num">ירידה בשנה רעה</th><th class="num">סיכוי לשנה מפסידה</th><th class="num">תוכנית פחות בסיס</th><th class="num">סיכון להתאמת יתר (⁦PBO⁩)</th><th class="num">רצף ההפסדים הארוך ביותר בזמן אמת</th><th class="num">עסקאות בזמן אמת</th><th class="num">פער מעקב</th>
+    </tr></thead><tbody><tr><td colspan="9" class="empty">טוען…</td></tr></tbody></table></div>
+    <p>שני הטורים של זמן אמת סופרים את כל העסקאות של השיטה שנסגרו מאז ההשקה, כולל עסקאות מעבדה שלא פורסמו, גם בשיטות שלא עברו את המבחן. בשיטה שנמדדת רק בזמן אמת אין נתוני עבר. תוכנית פחות בסיס: ההפרש, ב-⁦R⁩ לעסקה, בין תוכנית היציאה של ⁦Blip⁩ לבין יציאה פשוטה עם סטופ נגרר בלבד. בסוגריים: טווח ביטחון של 95%. פער מעקב: ההבדל הממוצע בתוצאה בין מעקב לפי מחירים של כל שעה לבין מעקב לפי מחירי סוף היום.</p>
+  </details>
+
+  <h2>הטיות ומגבלות ידועות</h2>
+  <ul>
+    <li><b>רק תוצאות בזמן אמת, אחרי ההשקה, הן באמת מחוץ למדגם.</b> תוצאות עבר ותוצאות בזמן אמת אף פעם לא מעורבבות.</li>
+    <li>התיעוד בזמן אמת משתמש בנתונים כפי שפורסמו ברגע האיתות. בדיקות העבר משתמשות בנתונים מתוקנים.</li>
+    <li>בבדיקות העבר של מט״ח הכניסה היא בפתיחה היומית הבאה, בערך שעה לפני הכניסה בזמן אמת.</li>
+    <li>בנכסים שהמחירים שלהם מגיעים ממקורות נתונים חינמיים, מעקב לפי מחירים של כל שעה יכול להיות שונה ממעקב לפי מחירי סוף היום. הפער שנמדד מוצג בטבלת הסיכון (פער מעקב).</li>
+    <li>בדיקות העבר בקריפטו משתמשות ברשימת מטבעות נכונה לכל נקודת זמן, כולל מטבעות שהוסרו מהמסחר. בבחירת תעודות הסל וזוגות המט״ח ייתכן שנשארה הטיה קטנה לטובת מי ששרד.</li>
+    <li>מחירי תעודות סל שונים ממחירי חוזים עתידיים וחוזי הפרשים, ולכן הרמות מוצגות גם כמרחק באחוזים.</li>
   </ul>
 
-  <h2 id="verify">How to verify</h2>
-  <p>Every signal (public and lab) and every lifecycle event is appended to a hash-chained log. Open trades are committed to the log as salted hashes and revealed in full when they close. In results-only mode nothing actionable is public while a trade is open; in live mode public signals are posted in real time. Each day&#39;s log head is timestamped with OpenTimestamps (<code>heads/</code>), and this site&#39;s git history is a second, independent timestamp trail.</p>
+  <h2 id="verify">איך לבדוק בעצמכם (למתקדמים)</h2>
+  <p>כל איתות, ציבורי או של המעבדה, וכל אירוע בחיים שלו נוספים ל<b>יומן ציבורי</b>: רשימה ציבורית של כל איתות וכל אירוע, לפי הסדר. כל שורה קשורה לשורה שלפניה, ולכן אי אפשר לשנות בדיעבד.</p>
+  <p>עסקה פתוחה נרשמת ביומן כ<b>חותם</b>: טביעת אצבע דיגיטלית של פרטי האיתות, שנרשמת ביומן לפני הכניסה בלי לחשוף את הפרטים. כשהעסקה נסגרת כל הפרטים נחשפים, וכל אחד יכול לבדוק שהם תואמים לחותם.</p>
+  <p>במצב תוצאות בלבד שום דבר שאפשר לפעול לפיו לא מתפרסם בזמן שעסקה פתוחה. במצב חי האיתותים הציבוריים מתפרסמים בזמן אמת.</p>
+  <p>כל יום השורה האחרונה ביומן מקבלת חותמת זמן: אישור חיצוני (⁦OpenTimestamps⁩) שהיומן היה קיים ברגע מסוים. הקבצים שמורים בתיקייה <code>heads/</code>, והיסטוריית הגרסאות של האתר היא תיעוד זמנים שני ובלתי תלוי.</p>
+  <p>להורדה: <a href="ledger.jsonl">יומן ציבורי</a> · <a href="verify_ledger.py">סקריפט הבדיקה</a>. כך מריצים אותו:</p>
   <pre>python verify_ledger.py ledger.jsonl</pre>
-  <p class="small muted">The script uses the Python standard library only. It checks the chain and that every reveal matches its earlier commitments. This is a hash-chained, timestamped log.</p>
+  <p class="small muted">הסקריפט משתמש רק בספריות המובנות של Python. הוא בודק את השרשרת, ושכל חשיפה תואמת לחותם שנרשם לפניה.</p>
+
+  <h2 id="glossary">מילון מונחים</h2>
+  <dl class="glossary">
+<dt id="g-term-r">⁦R⁩ (יחידת סיכון)</dt><dd>הסכום שמסכנים בעסקה אחת, כלומר כמה מפסידים אם המחיר מגיע לסטופ ההתחלתי. ⁦+1R⁩ = רווח בגובה הסיכון, ⁦-1R⁩ = הפסד בגובה הסיכון, ⁦+0.10R⁩ = ⁦10⁩ אגורות על כל שקל שמסכנים.</dd>
+<dt id="g-term-risk_1pct">בסיכון של ⁦1%⁩ לעסקה</dt><dd>אם מסכנים ⁦1%⁩ מהחשבון בכל עסקה, ⁦1R⁩ שווה בערך ל-⁦1%⁩ מהחשבון (חישוב היפותטי, סכום פשוט, לפני מס).</dd>
+<dt id="g-term-net_r">סה״כ נטו</dt><dd>סכום התוצאות של כל העסקאות שנסגרו, ב-⁦R⁩, אחרי עלויות משוערות.</dd>
+<dt id="g-term-expectancy">ממוצע לעסקה</dt><dd>התוצאה הממוצעת של עסקה שנסגרה, ב-⁦R⁩, אחרי עלויות.</dd>
+<dt id="g-term-win_rate">אחוז הצלחה</dt><dd>כמה מהעסקאות שנסגרו הסתיימו ברווח (מעל ⁦0R⁩). בשיטות מגמה זה בדרך כלל פחות מחצי, והרווח מגיע מכמה עסקאות גדולות.</dd>
+<dt id="g-term-profit_factor">יחס רווח להפסד</dt><dd>סך הרווחים חלקי סך ההפסדים. מעל ⁦1⁩: הרווחים גדולים מההפסדים. ∞: יש רווחים ועדיין אין הפסדים.</dd>
+<dt id="g-term-max_drawdown">ירידה מקסימלית מהשיא</dt><dd>הנפילה הגדולה ביותר מנקודת שיא עד השפל שאחריה, ב-⁦R⁩. באתר היא כוללת גם את מצב העסקאות הפתוחות.</dd>
+<dt id="g-term-losing_streak">רצף ההפסדים הארוך ביותר</dt><dd>הכי הרבה עסקאות רצופות שהסתיימו בלי רווח (⁦0R⁩ או פחות).</dd>
+<dt id="g-term-scratch">עסקה מאוזנת</dt><dd>עסקה שהסתיימה כמעט באפס, פחות מ-⁦0.1R⁩ לכל כיוון. היא נספרת גם ברווחים או בהפסדים.</dd>
+<dt id="g-term-unrealised">לא ממומש (עוד לא סופי)</dt><dd>המצב של עסקה פתוחה לפי המחיר האחרון. הוא משתנה עד שהעסקה נסגרת.</dd>
+<dt id="g-term-signal">איתות</dt><dd>הודעה אוטומטית שאומרת איזה נכס, באיזה כיוון, באיזה טווח מחירים נכנסים ועד מתי, איפה הסטופ ואיפה היעדים.</dd>
+<dt id="g-term-trade">עסקה</dt><dd>מה שקורה אחרי איתות, מהכניסה ועד היציאה האחרונה.</dd>
+<dt id="g-term-instrument">נכס</dt><dd>מניה, מטבע קריפטו, תעודת סל, מדד, זוג מטבעות או סחורה. ⁦Blip⁩ עוקב אחרי ⁦60⁩ נכסים.</dd>
+<dt id="g-side-LONG">קנייה</dt><dd>מרוויחים אם המחיר עולה.</dd>
+<dt id="g-side-SHORT">מכירה בחסר</dt><dd>מרוויחים אם המחיר יורד. הסטופ נמצא מעל מחיר הכניסה.</dd>
+<dt id="g-term-entry_range">טווח כניסה</dt><dd>המחירים שבהם מותר להיכנס. אם המחיר נפתח מחוץ לטווח, לא נכנסים והאיתות מבוטל.</dd>
+<dt id="g-term-valid_until">בתוקף עד</dt><dd>השעה האחרונה שבה מותר להיכנס לפי האיתות.</dd>
+<dt id="g-term-ref_price">מחיר ייחוס</dt><dd>מחיר הסגירה של יום האיתות. ממנו מחושבים הסטופ, היעדים וטווח הכניסה.</dd>
+<dt id="g-term-fill">כניסה (לפי התיעוד)</dt><dd>המחיר שנרשם ככניסה: מחיר הפתיחה של השעה הראשונה שבה אפשר לסחור אחרי הפרסום.</dd>
+<dt id="g-term-stop">סטופ (יציאה בהפסד)</dt><dd>המחיר שבו יוצאים כדי להגביל את ההפסד. הגעה לסטופ ההתחלתי היא הפסד של בערך ⁦1R⁩.</dd>
+<dt id="g-reason-BREAKEVEN">סטופ במחיר הכניסה</dt><dd>אחרי יעד ⁦1⁩ הסטופ עובר למחיר הכניסה, כך שעל החלק שנשאר כמעט לא מפסידים.</dd>
+<dt id="g-reason-TRAIL">סטופ נגרר</dt><dd>סטופ שזז אחרי המחיר רק בכיוון שמגן על הרווח, ואף פעם לא מתרחק.</dd>
+<dt id="g-term-target">יעד ⁦1⁩ / יעד ⁦2⁩</dt><dd>מחירים שבהם סוגרים בכל פעם שליש מהעסקה ברווח. את השליש האחרון משאירים עם סטופ נגרר.</dd>
+<dt id="g-reason-SIGNAL_EXIT">כלל יציאה</dt><dd>התנאי שפתח את העסקה כבר לא מתקיים, ולכן יוצאים בפתיחת המסחר הבאה. מודיעים על זה מראש.</dd>
+<dt id="g-reason-TIME_STOP">יציאה לפי זמן</dt><dd>עבר הזמן המרבי לעסקה, ולכן יוצאים בפתיחת המסחר הבאה.</dd>
+<dt id="g-status-open">פתוח</dt><dd>העסקה עדיין רצה, והתוצאה עוד לא סופית.</dd>
+<dt id="g-status-closed">נסגר</dt><dd>העסקה הסתיימה, והתוצאה סופית.</dd>
+<dt id="g-status-void">בוטל</dt><dd>לא נכנסו לעסקה, בדרך כלל כי המחיר נפתח מחוץ לטווח הכניסה או כבר מעבר לסטופ. נרשם כ-⁦0R⁩ ונשאר ברשימה.</dd>
+<dt id="g-status-expired">פג תוקף</dt><dd>לא היה מחיר מסחר בזמן שהאיתות היה בתוקף. נרשם כ-⁦0R⁩ ונשאר ברשימה.</dd>
+<dt id="g-term-entry_rule">כלל כניסה</dt><dd>חוק קבוע שמחליט מתי נכנסים לעסקה. יש ⁦5⁩ כללים.</dd>
+<dt id="g-term-family">שיטה</dt><dd>כלל כניסה אחד על סוג נכס אחד, למשל מעקב מגמה · מדדי מניות. יש ⁦12⁩ שיטות, וכל אחת נבדקת לבד.</dd>
+<dt id="g-strategy-tsmom">מעקב מגמה</dt><dd>נכנסים בכיוון שבו המחיר נע גם בחודש האחרון, גם ב-⁦3⁩ החודשים האחרונים וגם בשנה האחרונה.</dd>
+<dt id="g-strategy-donchian">פריצת טווח ⁦55⁩ יום</dt><dd>סגירה מעל השיא של ⁦55⁩ הימים האחרונים (קנייה) או מתחת לשפל שלהם (מכירה בחסר).</dd>
+<dt id="g-strategy-stock_high">שיא שנתי חדש</dt><dd>מניה נסגרת בשיא של ⁦52⁩ שבועות, מעל הממוצע של ⁦200⁩ הימים. קנייה בלבד, על ⁦17⁩ מניות גדולות בארה״ב.</dd>
+<dt id="g-strategy-crypto_ens">פריצה בקריפטו</dt><dd>פריצה כלפי מעלה שמאושרת ב-⁦3⁩ לפחות מתוך ⁦6⁩ טווחי זמן, בין ⁦20⁩ ל-⁦250⁩ יום. קנייה בלבד.</dd>
+<dt id="g-strategy-index_mr">ירידה קצרה במגמת עלייה</dt><dd>קנייה של מדד מניות אחרי ירידה חדה וקצרה, כשהמגמה הארוכה היא עלייה.</dd>
+<dt id="g-term-qualification">מבחן על נתוני עבר</dt><dd>בדיקה סטטיסטית חד-פעמית של שיטה על נתוני עבר, מול תנאים שנקבעו מראש. שיטה שעוברת אותה ממשיכה לתקופת ניסיון.</dd>
+<dt id="g-term-gate">תנאי במבחן</dt><dd>כל אחד מהתנאים שהשיטה חייבת לעמוד בהם.</dd>
+<dt id="g-term-holdout">תקופה שמורה</dt><dd>השנה האחרונה (מ-⁦1.11.2025⁩) נשמרה בצד ונבדקה פעם אחת בלבד.</dd>
+<dt id="g-qual_path-forward">מסלול זמן אמת בלבד</dt><dd>השיטה לא נבדקת על נתוני עבר, כי בדיקה כזו הייתה מטעה (למשל כשרשימת הנכסים נבחרה היום מתוך המצליחים). היא עוברת רק בדיקות טכניות, ונמדדת רק מעכשיו, בזמן אמת.</dd>
+<dt id="g-term-trial">תקופת ניסיון</dt><dd>מודדים את השיטה בזמן אמת לפי הכללים הקבועים שלה, בלי לפרסם איתותים. העסקאות שלה מוצגות רק אחרי שהן נסגרות.</dd>
+<dt id="g-term-shadow_trade">עסקת ניסיון</dt><dd>עסקה של שיטה שנמצאת בתקופת ניסיון. היא לא מתפרסמת בזמן אמת ולא נספרת בתוצאות הרשמיות.</dd>
+<dt id="g-state-UNQUALIFIED">לא עברה את המבחן</dt><dd>נבדקה ולא עמדה בתנאים, ולכן היא לא מפרסמת איתותים. ⁦Blip⁩ ממשיך לעקוב אחריה בשקט, ובגרסה הזו היא לא תיבדק שוב אוטומטית.</dd>
+<dt id="g-state-WAITING">ממתינה למבחן</dt><dd>עוד לא נבדקה, למשל כי חסרים נתונים או כי הכללים שלה השתנו.</dd>
+<dt id="g-state-SHADOW">בתקופת ניסיון</dt><dd>נמדדת בזמן אמת לפי הכללים הקבועים שלה, בלי לפרסם איתותים. העסקאות שלה מוצגות רק אחרי שהן נסגרות.</dd>
+<dt id="g-state-LIVE">מפרסמת</dt><dd>עברה את תקופת הניסיון, והאיתותים שלה מתפרסמים לציבור.</dd>
+<dt id="g-state-PAUSED">מושהית</dt><dd>איתותים חדשים נעצרו, כי התוצאות חצו גבול שנקבע מראש או כי בדיקת תקינות נכשלה. עסקאות פתוחות ממשיכות להיות מדווחות.</dd>
+<dt id="g-state-RETIRED">הוצאה משימוש</dt><dd>הושהתה פעמיים בתוך ⁦12⁩ חודשים, ולכן הופסקה לצמיתות.</dd>
+<dt id="g-term-backtest">בדיקת עבר (היפותטית)</dt><dd>חישוב של מה היה קורה אילו הכללים פעלו בעבר. לא כסף אמיתי ולא עסקאות אמיתיות.</dd>
+<dt id="g-term-out_of_sample">מחוץ למדגם</dt><dd>נתונים שלא שימשו לבניית הכללים. רק תוצאות בזמן אמת, אחרי ההשקה, הן בדיקה אמיתית.</dd>
+<dt id="g-term-costs">עלויות משוערות</dt><dd>עמלה, מרווח בין מחיר הקנייה למחיר המכירה, החלקה ועלות מימון. הן מנוכות מכל תוצאה.</dd>
+<dt id="g-term-carry">עלות מימון</dt><dd>עלות שנתית על החזקת עסקה פתוחה לאורך זמן.</dd>
+<dt id="g-term-cost_stress">מבחן לחץ עלויות</dt><dd>אותה בדיקה עם עלויות גבוהות פי ⁦1.5⁩ (במטבעות קריפטו קטנים: פי ⁦2⁩).</dd>
+<dt id="g-term-monitor">בקרת ביצועים</dt><dd>בודקת כל הזמן אם התוצאות בזמן אמת חורגות מגבולות שנקבעו מראש: רצף הפסדים, הפסד מצטבר או ירידה מהשיא.</dd>
+<dt id="g-term-monitor_alarm">התרעת בקרה</dt><dd>חריגה מאחד הגבולות. שיטה שמפרסמת מושהית. שיטה בתקופת ניסיון לא תוכל לעבור לפרסום.</dd>
+<dt id="g-term-kill_switch">מתג חירום</dt><dd>במצב חי, אם התוצאה המצטברת של העסקאות הציבוריות, כולל הפתוחות, יורדת ב-⁦40R⁩ מהשיא שלה, ⁦Blip⁩ חוזר לבד למצב תוצאות בלבד, ולא חוזר למצב חי בלי החלטה של המפעיל.</dd>
+<dt id="g-term-p95_dd_1y">ירידה בשנה רעה</dt><dd>ירידה מהשיא במשך שנה אחת, שרק ב-⁦5%⁩ מהשנים בסימולציה הייתה גדולה ממנה. ירידות כאלה הן חלק צפוי מהדרך.</dd>
+<dt id="g-term-plan_minus_baseline">תוכנית פחות בסיס</dt><dd>ההפרש, ב-⁦R⁩ לעסקה, בין תוכנית היציאה של ⁦Blip⁩ לבין יציאה פשוטה עם סטופ נגרר בלבד.</dd>
+<dt id="g-term-tracking_divergence">פער מעקב</dt><dd>ההבדל הממוצע בתוצאה בין מעקב לפי מחירים של כל שעה לבין מעקב לפי מחירי סוף היום.</dd>
+<dt id="g-term-atr">תנודה יומית ממוצעת (⁦ATR⁩)</dt><dd>כמה המחיר זז ביום, בממוצע על ⁦20⁩ הימים האחרונים.</dd>
+<dt id="g-mode-live">מצב חי</dt><dd>איתותים ציבוריים מתפרסמים ב-⁦#Alpha⁩ בזמן אמת.</dd>
+<dt id="g-mode-results_only">מצב תוצאות בלבד</dt><dd>בזמן שעסקה פתוחה לא מתפרסם שום דבר שאפשר לפעול לפיו. כל עסקה נחשפת אחרי שהיא נסגרת.</dd>
+<dt id="g-mode-off">מצב כבוי</dt><dd>אין פרסום ציבורי. התוצאות ממשיכות להירשם.</dd>
+<dt id="g-term-auto_live">מעבר אוטומטי למצב חי</dt><dd>ביום שהשיטה הראשונה מתחילה לפרסם, ⁦Blip⁩ עובר לבד למצב חי. כל שינוי מצב ידני, וגם מתג החירום, מבטלים את המעבר הזה.</dd>
+<dt id="g-term-ledger">יומן ציבורי</dt><dd>רשימה ציבורית של כל איתות וכל אירוע, לפי הסדר. כל שורה קשורה לשורה שלפניה, ולכן אי אפשר לשנות בדיעבד.</dd>
+<dt id="g-term-commitment">חותם</dt><dd>טביעת אצבע דיגיטלית של פרטי האיתות, שנרשמת ביומן לפני הכניסה בלי לחשוף את הפרטים.</dd>
+<dt id="g-message_kind-reveal">חשיפה</dt><dd>אחרי שעסקה נסגרת מתפרסמים כל הפרטים שלה, וכל אחד יכול לבדוק שהם תואמים לחותם שנרשם מראש.</dd>
+<dt id="g-term-proof_code">קוד הוכחה</dt><dd>מספר השורה האחרונה ביומן ו-⁦16⁩ התווים הראשונים של טביעת האצבע שלה. הוא משתנה בכל רישום.</dd>
+<dt id="g-term-hash">גיבוב (טביעת אצבע דיגיטלית)</dt><dd>קוד קצר שמחושב מטקסט. כל שינוי קטן בטקסט משנה אותו לגמרי.</dd>
+<dt id="g-term-timestamp">חותמת זמן</dt><dd>אישור חיצוני (⁦OpenTimestamps⁩) שהיומן היה קיים ברגע מסוים.</dd>
+<dt id="g-term-israel_time">שעון ישראל</dt><dd>השעות באתר מוצגות לפי שעון ישראל.</dd>
+</dl>
 </main>
 <footer><div class="wrap">
-  <p>Automated model output for research purposes only — not a recommendation to buy or sell and not personalized investment advice. <a href="disclaimer.html">Full disclaimer</a>.</p>
-  <p>Ledger head <span id="head" class="mono"></span></p>
+  <p>פלט אוטומטי של מודל. <b>אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.</b> זה לא ייעוץ השקעות אישי. <a href="disclaimer.html">גילוי נאות מלא</a>.</p>
+  <p>קוד הוכחה: <span id="head" class="mono"></span> · <a href="ledger.jsonl">יומן ציבורי (למתקדמים)</a> · כל השעות באתר לפי שעון ישראל.</p>
 </div></footer>
-<script src="app.js"></script>
+<script src="app.js?v=he2"></script>
 </body>
 </html>

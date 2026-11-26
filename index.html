@@ -1,40 +1,63 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Blip — public record</title>
-<meta name="description" content="Every Blip signal, wins and losses, in R net of modeled costs. Hash-chained, timestamped log. For research only; not a recommendation to buy or sell.">
-<meta property="og:title" content="Blip — public record">
-<meta property="og:description" content="Every signal, wins and losses, in R net of modeled costs. For research only; not a recommendation.">
-<link rel="stylesheet" href="style.css">
+<title>תוצאות — Blip</title>
+<meta name="description" content="כל האיתותים הציבוריים של Blip, ברווח ובהפסד, אחרי עלויות משוערות. אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.">
+<meta property="og:title" content="תוצאות — Blip">
+<meta property="og:description" content="כל האיתותים הציבוריים של Blip, ברווח ובהפסד, אחרי עלויות משוערות. אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.">
+<meta property="og:locale" content="he_IL">
+<link rel="stylesheet" href="style.css?v=he2">
 </head>
 <body data-page="index" data-root="">
 <header class="top"><div class="wrap">
-  <a class="brand" href="index.html">Blip<span>.</span></a>
-  <nav><a class="on" href="index.html">Record</a><a href="shadow.html">Shadow</a><a href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+  <a class="brand" dir="ltr" href="index.html">Blip<span>.</span></a>
+  <nav><a class="on" href="index.html">תוצאות</a><a href="shadow.html">תקופת ניסיון</a><a href="methodology.html">איך זה עובד</a><a href="disclaimer.html">גילוי נאות</a></nav>
 </div></header>
 <main class="wrap">
-  <div id="banner" class="banner" hidden></div>
-  <h1>Public record</h1>
-  <p class="sub">Forward results since launch, in R per trade, net of modeled fees, slippage and financing. Losses, voids and expiries are counted. Only post-launch results are genuinely out-of-sample.</p>
-  <div id="kpis" class="kpis" aria-live="polite"></div>
-  <h2>Equity (cumulative R)</h2>
-  <div id="equity" class="chart"><div class="empty">Loading…</div></div>
-  <h2>Signals</h2>
-  <div class="scroll"><table class="tbl" id="signals"><thead><tr>
-    <th>#</th><th>Instrument</th><th>Side</th><th>Status</th><th class="num">Result</th><th>Published</th><th>Closed</th>
-  </tr></thead><tbody><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
-  <h2>By strategy</h2>
-  <div class="scroll"><table class="tbl" id="bystrategy"><thead><tr>
-    <th>Strategy</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg R</th><th class="num">Net R</th><th class="num">Void / expired</th><th></th>
-  </tr></thead><tbody></tbody></table></div>
+  <h1>תוצאות</h1>
+  <p class="sub">כאן מופיעים כל האיתותים הציבוריים של Blip מאז ההשקה, גם ברווח וגם בהפסד. כל תוצאה נמדדת ב-R, כלומר ביחס לסכום שסיכנו בעסקה (<a href="methodology.html#g-term-r">מה זה R?</a>), אחרי עלויות משוערות. גם איתותים שבוטלו או שפג תוקפם נספרים.</p>
+  <section id="stage" class="stage" aria-live="polite" hidden>
+    <h2>מה קורה עכשיו</h2>
+    <div id="stage-body"></div>
+  </section>
+  <p id="record-empty" class="empty" hidden>עדיין אין תוצאות ציבוריות. הן יופיעו כאן אחרי שהעסקה הציבורית הראשונה תיסגר.</p>
+  <div id="record">
+    <div id="kpis" class="kpis" aria-live="polite"></div>
+    <details class="explain"><summary>מה המספרים האלה אומרים?</summary>
+      <dl class="help">
+        <dt>סה״כ נטו</dt><dd>סכום התוצאות של כל העסקאות שנסגרו, ב-⁦R⁩, אחרי עלויות משוערות.</dd>
+        <dt>עסקאות שנסגרו</dt><dd>כמה עסקאות הסתיימו. איתותים שבוטלו או שפג תוקפם לא נכללים כאן.</dd>
+        <dt>אחוז הצלחה</dt><dd>כמה מהעסקאות שנסגרו הסתיימו ברווח (מעל ⁦0R⁩). בשיטות מגמה זה בדרך כלל פחות מחצי, והרווח מגיע מכמה עסקאות גדולות.</dd>
+        <dt>ממוצע לעסקה</dt><dd>התוצאה הממוצעת של עסקה שנסגרה, ב-⁦R⁩, אחרי עלויות.</dd>
+        <dt>יחס רווח להפסד</dt><dd>סך הרווחים חלקי סך ההפסדים. מעל ⁦1⁩: הרווחים גדולים מההפסדים. ∞: יש רווחים ועדיין אין הפסדים.</dd>
+        <dt>ירידה מקסימלית מהשיא</dt><dd>הנפילה הגדולה ביותר מנקודת שיא עד השפל שאחריה, ב-⁦R⁩. באתר היא כוללת גם את מצב העסקאות הפתוחות.</dd>
+        <dt>רצף ההפסדים הארוך ביותר</dt><dd>הכי הרבה עסקאות רצופות שהסתיימו בלי רווח (⁦0R⁩ או פחות).</dd>
+        <dt>בוטל</dt><dd>לא נכנסו לעסקה, בדרך כלל כי המחיר נפתח מחוץ לטווח הכניסה או כבר מעבר לסטופ. נרשם כ-⁦0R⁩ ונשאר ברשימה.</dd>
+        <dt>פג תוקף</dt><dd>לא היה מחיר מסחר בזמן שהאיתות היה בתוקף. נרשם כ-⁦0R⁩ ונשאר ברשימה.</dd>
+        <dt>לא ממומש (עוד לא סופי)</dt><dd>המצב של עסקה פתוחה לפי המחיר האחרון. הוא משתנה עד שהעסקה נסגרת.</dd>
+        <dt>עסקה מאוזנת</dt><dd>עסקה שהסתיימה כמעט באפס, פחות מ-⁦0.1R⁩ לכל כיוון. היא נספרת גם ברווחים או בהפסדים.</dd>
+      </dl>
+    </details>
+    <h2>התוצאות לאורך זמן (R מצטבר)</h2>
+    <div id="equity" class="chart"><div class="empty">טוען…</div></div>
+    <h2>איתותים</h2>
+    <div class="scroll"><table class="tbl" id="signals"><thead><tr>
+      <th>מס׳</th><th>נכס</th><th>כיוון</th><th>מצב</th><th class="num">תוצאה</th><th>פורסם</th><th>נסגר</th>
+    </tr></thead><tbody><tr><td colspan="7" class="empty">טוען…</td></tr></tbody></table></div>
+    <h2>לפי שיטה</h2>
+    <div class="scroll"><table class="tbl" id="byfamily"><thead><tr>
+      <th>שיטה</th><th class="num">עסקאות שנסגרו</th><th class="num">אחוז הצלחה</th><th class="num">ממוצע לעסקה</th><th class="num">סה״כ נטו</th><th class="num">בוטל / פג תוקף</th><th></th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
 </main>
 <footer><div class="wrap">
-  <p>Automated model output for research purposes only — not a recommendation to buy or sell and not personalized investment advice. Operator holds no position, gets no compensation. Risk of loss. <a href="disclaimer.html">Full disclaimer</a>.</p>
-  <p>Open trades are committed as salted hashes and revealed after they close. <a href="methodology.html#verify">How to verify</a> · ledger head <span id="head" class="mono"></span></p>
+  <p>פלט אוטומטי של מודל. <b>אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.</b> זה לא ייעוץ השקעות אישי. המפעיל לא מחזיק בנכסים שמופיעים באיתותים ולא מקבל תמורה. במסחר יש סיכון להפסד. <a href="disclaimer.html">גילוי נאות מלא</a>.</p>
+  <p>עסקאות פתוחות נרשמות ביומן כטביעת אצבע דיגיטלית, והפרטים נחשפים אחרי שהן נסגרות. <a href="methodology.html#verify">איך לבדוק</a> · <a href="ledger.jsonl">יומן ציבורי (למתקדמים)</a>: רשימה ציבורית של כל איתות וכל אירוע, לפי הסדר. כל שורה קשורה לשורה שלפניה, ולכן אי אפשר לשנות בדיעבד.</p>
+  <p>קוד הוכחה: <span id="head" class="mono"></span> · כל השעות באתר לפי שעון ישראל.</p>
 </div></footer>
-<script src="app.js"></script>
+<script src="app.js?v=he2"></script>
 </body>
 </html>

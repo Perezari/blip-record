@@ -1,35 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>Blip — shadow results</title>
-<meta name="description" content="Closed forward-test trades of strategy families not yet public. Testing only, not in the public record.">
-<link rel="stylesheet" href="style.css">
+<title>תקופת ניסיון — Blip</title>
+<meta name="description" content="עסקאות שנסגרו של שיטות בתקופת ניסיון. לבדיקה בלבד, לא חלק מהתוצאות הציבוריות. אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.">
+<meta property="og:locale" content="he_IL">
+<link rel="stylesheet" href="style.css?v=he2">
 </head>
 <body data-page="shadow" data-root="">
 <header class="top"><div class="wrap">
-  <a class="brand" href="index.html">Blip<span>.</span></a>
-  <nav><a href="index.html">Record</a><a class="on" href="shadow.html">Shadow</a><a href="methodology.html">Methodology</a><a href="disclaimer.html">Disclaimer</a><a href="ledger.jsonl">Ledger</a></nav>
+  <a class="brand" dir="ltr" href="index.html">Blip<span>.</span></a>
+  <nav><a href="index.html">תוצאות</a><a class="on" href="shadow.html">תקופת ניסיון</a><a href="methodology.html">איך זה עובד</a><a href="disclaimer.html">גילוי נאות</a></nav>
 </div></header>
 <main class="wrap">
   <div id="banner" class="banner" hidden></div>
-  <h1>Shadow results</h1>
-  <p class="sub">Testing only, not in the public record. A strategy family publishes only after it passes the qualification gate and a forward shadow period; these are its closed shadow trades, revealed after close.</p>
-  <h2>By family</h2>
+  <h1>תקופת ניסיון</h1>
+  <p class="sub">לפני ששיטה מתחילה לפרסם איתותים, היא עוברת תקופת ניסיון: מודדים אותה בזמן אמת, לפי אותם כללים, בלי לפרסם שום דבר. כאן מופיעות העסקאות שנסגרו בתקופה הזו. הן לבדיקה בלבד ולא נכללות בתוצאות הציבוריות. כל עסקה מופיעה כאן רק אחרי שהיא נסגרת.</p>
+  <p class="sub">כמה זמן זה לוקח? לפחות 60 יום, ובחלק מהשיטות חצי שנה או 9 חודשים. <a href="methodology.html#stages">כל התנאים</a>.</p>
+  <section id="trialprogress" class="stage" aria-live="polite" hidden>
+    <h2>איפה השיטות בתקופת הניסיון עומדות</h2>
+    <div id="trialprogress-body"></div>
+  </section>
+  <h2>לפי שיטה</h2>
   <div class="scroll"><table class="tbl" id="shadowfam"><thead><tr>
-    <th>Family</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg R</th><th class="num">Net R</th><th class="num">Void / expired</th>
-  </tr></thead><tbody><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
-  <h2>Trades</h2>
+    <th>שיטה</th><th class="num">עסקאות שנסגרו</th><th class="num">אחוז הצלחה</th><th class="num">ממוצע לעסקה</th><th class="num">סה״כ נטו</th><th class="num">בוטל / פג תוקף</th>
+  </tr></thead><tbody><tr><td colspan="6" class="empty">טוען…</td></tr></tbody></table></div>
+  <h2>עסקאות שנסגרו</h2>
   <div class="scroll"><table class="tbl" id="shadowtrades"><thead><tr>
-    <th>Ref</th><th>Instrument</th><th>Side</th><th>Strategy</th><th>Status</th><th class="num">Result</th><th>Entry</th><th>Exit</th>
+    <th>מזהה</th><th>נכס</th><th>כיוון</th><th>שיטה</th><th>מצב</th><th class="num">תוצאה</th><th>כניסה</th><th>יציאה</th>
   </tr></thead><tbody></tbody></table></div>
 </main>
 <footer><div class="wrap">
-  <p>For research only; not a recommendation. Shadow trades are model-tracked under the same rules as public signals; they were never published while open. <a href="disclaimer.html">Full disclaimer</a>.</p>
-  <p>Ledger head <span id="head" class="mono"></span></p>
+  <p><b>אין באמור המלצה לביצוע פעולה, אלא לצורך מחקר בלבד.</b> עסקאות הניסיון נמדדות לפי אותם כללים כמו האיתותים הציבוריים, אבל הן לא פורסמו בזמן שהיו פתוחות. <a href="disclaimer.html">גילוי נאות מלא</a>.</p>
+  <p>קוד הוכחה: <span id="head" class="mono"></span> · <a href="ledger.jsonl">יומן ציבורי (למתקדמים)</a> · כל השעות באתר לפי שעון ישראל.</p>
 </div></footer>
-<script src="app.js"></script>
+<script src="app.js?v=he2"></script>
 </body>
 </html>
